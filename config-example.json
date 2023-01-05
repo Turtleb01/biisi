@@ -1,0 +1,17 @@
+{
+  "google": {
+    "clientID": "",
+    "clientSecret": ""
+  },
+  "spotify": {
+    "clientID": "",
+    "clientSecret": ""
+  },
+  "spotifySearch": {
+    "clientID": "",
+    "clientSecret": ""
+  },
+  "password": "",
+  "footer":"<a href=\"https://github.com/Turtleb01/biisi\">Github</a>",
+  "header":""
+}

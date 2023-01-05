@@ -1,0 +1,14 @@
+<li id="%trackId%" class="w3-row w3-margin-bottom w3-margin-top w3-dark-gray w3-round-large" style="min-height:120px">
+  <meta createdAt="%createdAt%">
+  <div class="w3-col s8 m3 albumcover">
+    <img style="height:100px" src="%image%"></img>
+  </div>
+  <div class="w3-col s9 m6 trackname">
+    <p>%artists%</p>
+    <a class="w3-large tracklink">Lisää %name%</a>
+  </div>
+  <div class="w3-col s3 m2 w3-right" style="text-align:right;">
+    <p class="duration">%duration%</p>
+    <img src="https://clasu.fi/img/play.svg" class="playbutton" onclick='this.hidden=true;this.parentElement.parentElement.innerHTML+="<iframe class=\"w3-col s12 m12 hidden\" style=\"height:85px;border-width:0;\" src=\"https://open.spotify.com/embed/track/%trackId%\"></iframe>";'>
+  </div>
+</li>

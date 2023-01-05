@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html style="scroll-padding-top:56px">
+<head>
+  <title>Biisi</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Yksinkertainen verkkokäyttöliittymä, jossa voit valita haluamaasi musiikkia yhteistä soittolistaa varten.">
+  <link rel="icon" href="https://clasu.fi/img/contabo-green.webp" type="image/webp">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body style="background:black">
+
+<div class="w3-container w3-black">
+  <h1 class="w3-center">Illanistujaisten biisilista</h1>
+  <div class="w3-content" style="max-width:700px">
+<BIISI_HEADER>
+  </div>
+</div>
+
+<div style="position:sticky;top:0;width:100%;height:55px;z-index:100;">
+  <div class="w3-row w3-padding w3-black">
+    <div class="w3-col s3">
+      <a href="/search.html#search" class="w3-button w3-block w3-dark-gray">HAKU</a>
+    </div>
+    <div class="w3-col s3">
+      <a href="#submit" class="w3-button w3-block w3-black">LISÄÄ</a>
+    </div>
+    <div class="w3-col s3">
+      <a href="#vote" class="w3-button w3-block w3-black">ÄÄNESTÄ</a>
+    </div>
+    <div class="w3-col s3">
+      <a href="#credits" class="w3-button w3-block w3-black">TEKIJÄT</a>
+    </div>
+  </div>
+</div>
+
+<div class="w3-container w3-<COLOR>" id="submit">
+  <h1 class="w3-center"><SUBMIT></h1>
+  <form action="/submit" method="post" class="w3-content" style="max-width:700px">
+    <input id="link" name="link" pattern="https:\/\/open.spotify.com\/track\/[a-zA-Z0-9]{22}.*" required class="w3-input w3-pale-<COLOR> w3-border w3-round-large w3-margin-bottom" type="text" style="width:100%" placeholder="Liitä tähän Spotify-linkki">
+    <input type="submit" value="Lähetä" class="w3-btn w3-<COLOR> w3-border w3-border-white w3-round-large w3-margin-bottom" style="width:100%;">
+  </form>
+</div>
+
+<div class="w3-container w3-black" id="vote">
+  <div class="w3-content" style="max-width:700px">
+    <div class="w3-margin-top">
+      Järjestys:
+      <select class="w3-select w3-dark-gray" style="width:unset; border-bottom:0;" name="sort" onchange="biisiSort(this.value)">
+        <option value="votes-r">Äänten määrä (paras ensin)</option>
+        <option value="votes">Äänten määrä (huonoin ensin)</option>
+        <option value="name">Kappaleen nimi A-Ö</option>
+        <option value="name-r">Kappaleen nimi Ö-A</option>
+        <option value="artist">Artistin nimi A-Ö</option>
+        <option value="artist-r">Artistin nimi Ö-A</option>
+        <option value="duration">Kappaleen pituus (lyhyin ensin)</option>
+        <option value="duration-r">Kappaleen pituus (pisin ensin)</option>
+        <option selected value="created-r">Lisäysaika (uusin ensin)</option>
+        <option value="created">Lisäysaika (vanhin ensin)</option>
+      </select>
+    </div>
+    <ul id="list" class="w3-ul">
+<BIISI_LIST>
+    </ul>
+  </div>
+</div>
+
+<div class="w3-container w3-dark-gray" id="credits" style="font-size:8px">
+  <div class="w3-content" style="max-width:700px">
+<BIISI_FOOTER>
+  </div>
+</div>
+
+<script>
+document.addEventListener("click", async (event) => {
+  let voteclass = ["vote-down", "vote-null", "vote-up"];
+  let element = event.srcElement;
+  if(element.classList.contains("vote")) {
+  } else if(element.classList.contains("arrow")) {
+    element = element.parentElement;
+  } else {
+    return;
+  }
+  let div = element.parentElement;
+  let prevValue = voteclass.findIndex(e=>div.classList.contains(e))-1;
+  if(prevValue==-2) document.location="";
+  let clicked = element.classList.contains("hi-up")?1:-1;
+  let value = (prevValue===clicked)?0:clicked;
+  let trackId = div.parentElement.id;
+  let res = await fetch("/vote", {
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "body": `trackId=${trackId}&value=${value}`,
+    "method": "POST",
+    "credentials": "include"
+  });
+  if(res.redirected) {
+    alert("Kirjaudu sisään!");
+    document.location="/login.html";
+  }
+  div.querySelector(".votecount").innerText = await res.text();
+  div.classList.replace(voteclass[prevValue+1],voteclass[value+1]);
+});
+
+HTMLUListElement.prototype.sort = function(f) {
+  Array.from(this.children)
+    .sort(f)
+    .forEach(e=>{
+      e.remove();
+      this.appendChild(e);
+    });
+}
+
+function sortBy(e,reverse) {
+  return((a,b) => {
+    if(e(a)<e(b)) {
+      return(reverse?1:-1);
+    } else if(e(a)>e(b)){
+      return(reverse?-1:1);
+    } else {
+      return 0;
+    }
+  });
+}
+
+function biisiSort(value) {
+  let options = value.split("-");
+  switch(options[0]) {
+    case "votes":
+      var sorter = e => parseInt(e.querySelector(".votecount").innerText);
+      break;
+    case "name":
+      var sorter = e => e.querySelector(".trackname > a").innerText;
+      break;
+    case "artist":
+      var sorter = e => e.querySelector(".trackname > p").innerText;
+      break;
+    case "duration":
+      var sorter = e => e.querySelector(".duration").innerText.padStart(20,"0");
+      break;
+    case "created":
+      var sorter = e => e.querySelector("meta").getAttribute("createdAt");
+      break;
+  }
+  document.getElementById("list").sort(sortBy(sorter, options[1]))
+}
+<ADMIN>
+</script>
+
+<style>
+.w3-ul li {
+  border-bottom:none;
+}
+.arrow {
+  cursor:pointer;
+  width:20px;
+  height:20px;
+  filter:invert(1);
+  transform: translate(0px, -3px);
+}
+.playbutton {
+  cursor:pointer;
+  width:40px;
+  height:40px;
+  filter:invert(1);
+}
+.arrow-down {
+  transform:rotate(180deg);
+}
+.vote-up > .hi-up > .arrow {
+  filter:invert(0);
+}
+.vote-down > .hi-down > .arrow {
+  filter:invert(0);
+}
+.vote-up > .hi-up {
+  color: #000!important;
+  background-color: #f1f1f1!important;
+}
+.vote-down > .hi-down {
+  color: #000!important;
+  background-color: #f1f1f1!important;
+}
+.w3-btn {
+  padding:8px 8px;
+}
+@media (max-width: 600px) {
+  .albumcover {
+    text-align:right;
+  }
+}
+@media (min-width: 601px) {
+  .albumcover {
+    max-width:120px;
+  }
+}
+.trackname {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+</style>
+</body>
+</html>
