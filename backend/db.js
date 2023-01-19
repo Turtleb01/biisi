@@ -86,6 +86,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  spotifyId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   admin: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
