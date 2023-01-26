@@ -1,5 +1,7 @@
 const { Sequelize, Op, DataTypes, QueryTypes } = require('sequelize');
 
+const config = require("./../config.json");
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'db.sqlite',
@@ -112,7 +114,7 @@ module.exports.addUser = async (user) => {
     user: user.id,
     username: user.displayName,
     contact: user.emails[0]?.value,
-    admin: ["100469878553284192775","113949629200210228268"].includes(user.id)
+    admin: config.adminList.includes(user.id)
   }).then(()=>{
     console.log("Successfully added user");
   }).catch(err=>{

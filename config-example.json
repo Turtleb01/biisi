@@ -12,6 +12,8 @@
     "clientSecret": ""
   },
   "password": "",
+  "adminList": [
+  ],
   "footer":"<a href=\"https://github.com/Turtleb01/biisi\">Github</a>",
   "header":""
 }
