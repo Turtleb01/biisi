@@ -1,6 +1,7 @@
 # BIISI
 config.json
 db.sqlite
+db-backup/
 
 # Logs
 logs
