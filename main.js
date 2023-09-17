@@ -207,9 +207,9 @@ app.get("/dump/txt", async (req, res) => {
   }
   res.setHeader('content-type', 'text/plain');
   res.send(
-    (await db.txt())
+    (await db.json())
     .tracks
-    .map(e=>"https://open.spotify.com/track/"+e.id)
+    .map(e=>"https://open.spotify.com/track/"+e.trackId)
     .join("\n")
   );
 });
