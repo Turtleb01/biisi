@@ -190,14 +190,28 @@ app.post("/remove", async (req, res) => {
   res.send(String(status));
 });
 
-// DB dump endpoint
-app.get("/json", async (req, res) => {
+// DB dump endpoints
+app.get("/dump/json", async (req, res) => {
   if(!(await db.isAdmin(req.user))) {
     res.send("Not admin!");
     return;
   }
   res.setHeader('content-type', 'application/json');
   res.send(JSON.stringify(await db.json()));
+});
+
+app.get("/dump/txt", async (req, res) => {
+  if(!(await db.isAdmin(req.user))) {
+    res.send("Not admin!");
+    return;
+  }
+  res.setHeader('content-type', 'text/plain');
+  res.send(
+    (await db.txt())
+    .tracks
+    .map(e=>"https://open.spotify.com/track/"+e.id)
+    .join("\n")
+  );
 });
 
 app.get(["/", "/index.html"], async (req, res) => {
